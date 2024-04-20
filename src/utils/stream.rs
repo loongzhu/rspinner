@@ -9,6 +9,14 @@ pub enum Stream {
     Stdout,
 }
 
+pub enum State {
+    Loading,
+    Info,
+    Success,
+    Warn,
+    Error,
+}
+
 #[allow(dead_code)]
 #[warn(unreachable_code)]
 impl Stream {
@@ -31,10 +39,24 @@ impl Stream {
     }
 
     /// Writes the current message and optionally prints the durations
-    pub fn write(&self, frame: &str, message: &str) -> Result<()> {
+    pub fn write(&self, frame: &str, message: &str, state: State) -> Result<()> {
         let mut writer = self.match_target();
-        Self::print_message_with_duration(&mut writer, frame, message)?;
 
-        Ok(())
+        let icon = match state {
+            State::Loading => frame.blue(),
+            State::Info => "🛈".black(),
+            State::Success => "✔".green(),
+            State::Warn => "⚠".yellow(),
+            State::Error => "✖".red(),
+        };
+
+        let end = match state {
+            State::Loading => "",
+            _ => "\n",
+        };
+
+        write!(writer, "\r{} {}{end}", icon, message)?;
+
+        writer.flush()
     }
 }

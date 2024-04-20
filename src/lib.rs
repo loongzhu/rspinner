@@ -5,20 +5,23 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub use crate::utils::stream::Stream;
+pub use crate::utils::stream::{State, Stream};
 
 mod utils;
 
+#[warn(dead_code)]
 pub struct Spinner {
-    sender: Sender<(Instant, Option<String>)>,
+    sender: Sender<(Instant, State, String)>,
     join: Option<JoinHandle<()>>,
-    stream: Stream,
+    message: String,
 }
 
 impl Drop for Spinner {
     fn drop(&mut self) {
         if self.join.is_some() {
-            self.sender.send((Instant::now(), None)).unwrap();
+            self.sender
+                .send((Instant::now(), State::Loading, "self.message".to_string()))
+                .unwrap();
             self.join.take().unwrap().join().unwrap();
         }
     }
@@ -27,31 +30,37 @@ impl Drop for Spinner {
 const FRAMES: [&str; 10] = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 impl Spinner {
-    pub fn new(message: Option<String>) -> Self {
+    pub fn new(message: Option<&str>) -> Self {
         let message = match message {
             Some(message) => message,
-            None => "Loading...".to_string(),
+            None => "Loading...",
         };
 
-        Self::start(message)
+        Self::start_in(message)
     }
 
-    fn start(message: String) -> Self {
+    pub fn start_in(m: &str) -> Self {
         let stream = Stream::default();
 
-        let (sender, recv) = channel::<(Instant, Option<String>)>();
+        let (sender, recv) = channel::<(Instant, State, String)>();
 
         let join = thread::spawn(move || 'outer: loop {
             for frame in FRAMES.iter() {
-                let (do_stop, _stop_time, stop_symbol) = match recv.try_recv() {
-                    Ok((stop_time, stop_symbol)) => (true, Some(stop_time), stop_symbol),
-                    Err(TryRecvError::Disconnected) => (true, None, None),
-                    Err(TryRecvError::Empty) => (false, None, None),
+                let (do_stop, _stop_time, state, message) = match recv.try_recv() {
+                    Ok((stop_time, state, message)) => (true, Some(stop_time), state, message),
+                    Err(TryRecvError::Disconnected) => {
+                        (true, None, State::Loading, "Loading...".to_string())
+                    }
+                    Err(TryRecvError::Empty) => {
+                        (false, None, State::Loading, "Loading...".to_string())
+                    }
                 };
 
-                let frame = stop_symbol.unwrap_or_else(|| frame.to_string());
+                let frame = frame.to_string();
 
-                stream.write(&frame, &message).expect("IO Error");
+                let message = message.to_string();
+
+                stream.write(&frame, &message, state).expect("IO Error");
 
                 if do_stop {
                     break 'outer;
@@ -64,33 +73,33 @@ impl Spinner {
         Self {
             sender,
             join: Some(join),
-            stream,
+            message: m.to_string(),
         }
     }
 
-    pub fn info(&self) {
-        self.sender
-            .send((Instant::now(), Some("\n".to_string())))
-            .unwrap();
+    fn wirte(&mut self, state: State, message: Option<&str>) {
+        let m = match message {
+            Some(message) => message.to_string(),
+            None => self.message.to_string(),
+        };
+        self.sender.send((Instant::now(), state, m)).unwrap();
 
-        self.stream.write("✔", "Info").unwrap();
+        self.join.take().unwrap().join().unwrap();
     }
 
-    pub fn success(&self) {
-        self.sender
-            .send((Instant::now(), Some("✖".to_string())))
-            .unwrap();
+    pub fn info(&mut self, message: Option<&str>) {
+        self.wirte(State::Info, message)
     }
 
-    pub fn warning(&self) {
-        self.sender
-            .send((Instant::now(), Some("⚠".to_string())))
-            .unwrap();
+    pub fn success(&mut self, message: Option<&str>) {
+        self.wirte(State::Success, message)
     }
 
-    pub fn error(&self) {
-        self.sender
-            .send((Instant::now(), Some("🛈".to_string())))
-            .unwrap();
+    pub fn warning(&mut self, message: Option<&str>) {
+        self.wirte(State::Warn, message)
+    }
+
+    pub fn error(&mut self, message: Option<&str>) {
+        self.wirte(State::Error, message)
     }
 }
