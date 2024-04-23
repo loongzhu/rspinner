@@ -30,6 +30,17 @@ impl Drop for Spinner {
 const FRAMES: [&str; 10] = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 impl Spinner {
+    /// Creates a new Spinner with a message
+    /// If no message is provided, it defaults to "Loading..."
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use spinner_rs::Spinner;
+    ///
+    /// let mut spinner = Spinner::new(Some("Loading..."));
+    ///
+    /// ```
     pub fn new(message: Option<&str>) -> Self {
         let message = match message {
             Some(message) => message,
@@ -87,18 +98,78 @@ impl Spinner {
         self.join.take().unwrap().join().unwrap();
     }
 
+    /// Writes the message with the Loading state
+    /// If no message is provided, it defaults to the message provided in the constructor
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use spinner_rs::Spinner;
+    ///
+    /// let mut spinner = Spinner::new(Some("Loading..."));
+    ///
+    /// spinner.info(None);
+    ///
+    /// spinner.info(Some("Loading..."));
+    ///
+    /// ```
     pub fn info(&mut self, message: Option<&str>) {
         self.wirte(State::Info, message)
     }
 
+    /// Writes the message with the Loading state
+    /// If no message is provided, it defaults to the message provided in the constructor
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use spinner_rs::Spinner;
+    ///
+    /// let mut spinner = Spinner::new(Some("Loading..."));
+    ///
+    /// spinner.success(None);
+    ///
+    /// spinner.success(Some("Loading..."));
+    ///
+    /// ```
     pub fn success(&mut self, message: Option<&str>) {
         self.wirte(State::Success, message)
     }
 
+    /// Writes the message with the Loading state
+    /// If no message is provided, it defaults to the message provided in the constructor
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use spinner_rs::Spinner;
+    ///
+    /// let mut spinner = Spinner::new(Some("Loading..."));
+    ///
+    /// spinner.warning(None);
+    ///
+    /// spinner.warning(Some("Loading..."));
+    ///
+    /// ```
     pub fn warning(&mut self, message: Option<&str>) {
         self.wirte(State::Warn, message)
     }
 
+    /// Writes the message with the Loading state
+    /// If no message is provided, it defaults to the message provided in the constructor
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use spinner_rs::Spinner;
+    ///
+    /// let mut spinner = Spinner::new(Some("Loading..."));
+    ///
+    /// spinner.error(None);
+    ///
+    /// spinner.error(Some("Loading..."));
+    ///
+    /// ```
     pub fn error(&mut self, message: Option<&str>) {
         self.wirte(State::Error, message)
     }
