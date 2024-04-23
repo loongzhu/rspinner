@@ -2,6 +2,18 @@
 name = "rspinner"
 version = "0.0.1"
 edition = "2021"
+authors = ["zhuzhenquan <mr.longzhentian@gmail.com>"]
+homepage = "https://github.com/loongzhu/rspinner"
+repository = "https://github.com/loongzhu/rspinner"
+description = "Elegant rust terminal spinner."
+keywords = ["spinner", "cli", "rust", "rust-spinner", "terminal"]
+license = "MIT"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
 
 [dependencies]
 colored = "2.1.0"
