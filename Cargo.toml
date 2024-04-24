@@ -1,6 +1,6 @@
 [package]
 name = "rspinner"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["zhuzhenquan <mr.longzhentian@gmail.com>"]
 homepage = "https://github.com/loongzhu/rspinner"
