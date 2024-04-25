@@ -21,5 +21,9 @@ fn main() {
 
     spinner.error(Some("Has Error!"));
 
-    println!("Hello, world!")
+    println!("Hello, world!");
+
+    spinner.warning(None);
+
+    spinner.info(None);
 }

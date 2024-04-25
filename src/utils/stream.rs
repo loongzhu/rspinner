@@ -28,16 +28,6 @@ impl Stream {
         }
     }
 
-    /// Writes the message with the duration
-    fn print_message_with_duration(
-        writer: &mut Box<dyn Write>,
-        frame: &str,
-        message: &str,
-    ) -> Result<()> {
-        write!(writer, "\r{} {}", frame.blue(), message)?;
-        writer.flush()
-    }
-
     /// Writes the current message and optionally prints the durations
     pub fn write(&self, frame: &str, message: &str, state: State) -> Result<()> {
         let mut writer = self.match_target();
