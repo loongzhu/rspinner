@@ -33,5 +33,5 @@ fn main() {
 ### Example
 
 ```bash
-cargo run --example spinner
+cargo run --example run
 ```
