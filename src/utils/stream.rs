@@ -34,7 +34,7 @@ impl Stream {
 
         let icon = match state {
             State::Loading => frame.blue(),
-            State::Info => "🛈".black(),
+            State::Info => "ℹ️".blue(),
             State::Success => "✔".green(),
             State::Warn => "⚠".yellow(),
             State::Error => "✖".red(),
