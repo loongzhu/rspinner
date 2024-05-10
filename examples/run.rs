@@ -7,7 +7,7 @@ fn main() {
 
     sleep(Duration::from_secs(2));
 
-    spinner.start(Some("Start -- 1"));
+    spinner.start(Some("Start - 1"));
 
     sleep(Duration::from_secs(2));
 
@@ -15,15 +15,17 @@ fn main() {
 
     // spinner.error(Some("Has Error!"));
 
-    spinner.start(Some("Start -- 2"));
+    spinner.start(Some("Start - 2"));
 
     sleep(Duration::from_secs(2));
 
     spinner.error(Some("Has Error!"));
 
-    println!("Hello, world!");
+    sleep(Duration::from_secs(1));
 
     spinner.warning(None);
+
+    sleep(Duration::from_secs(1));
 
     spinner.info(None);
 }
